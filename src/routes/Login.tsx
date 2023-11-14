@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { LoginForm } from '../types';
 import { inputProps, inputWrapperProps } from '../constants';
 import { auth } from '../api';
+import Input from '../components/Input';
 
 export default function Login() {
   const {
@@ -23,27 +24,24 @@ export default function Login() {
       console.log('login-error', e);
     }
   });
-  const inputOpt = { required: true };
 
   return (
     <div className='flex justify-center'>
       <form className='bg-gray-300 m-6 p-6 max-w-md' onSubmit={onSubmit}>
-        <div {...inputWrapperProps}>
-          <input
-            {...inputProps}
-            {...register('username', inputOpt)}
-            placeholder='Username'
-          />
-          {errors?.username && <div>This field is required.</div>}
-        </div>
-        <div {...inputWrapperProps}>
-          <input
-            {...inputProps}
-            {...register('password', inputOpt)}
-            placeholder='Password'
-          />
-          {errors?.password && <div>This field is required.</div>}
-        </div>
+        <Input
+          {...inputProps}
+          name='username'
+          register={register}
+          placeholder='Username'
+          errors={errors}
+        />
+        <Input
+          {...inputProps}
+          name='password'
+          register={register}
+          placeholder='Password'
+          errors={errors}
+        />
         <div {...inputWrapperProps}>
           <input {...inputProps} className='float-right' type='submit' />
         </div>

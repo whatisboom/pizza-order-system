@@ -9,15 +9,17 @@ type OrderItemProps = {
     Table_No: number;
     Order_ID: number;
   };
+  deleteCallback: Function;
 };
 
 export default function OrderItem({
   item: { Size, Crust, Flavor, Table_No, Order_ID },
+  deleteCallback,
 }: OrderItemProps) {
   return (
     <div className='bg-gray-300 px-6 py-3 my-3 rounded'>
       {Order_ID}: {[Size, Crust, Flavor].join(' ')} for table: {Table_No}{' '}
-      <DeleteButton id={Order_ID} />
+      <DeleteButton id={Order_ID} callback={deleteCallback} />
     </div>
   );
 }

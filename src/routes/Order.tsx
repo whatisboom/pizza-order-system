@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { OrderForm } from '../types';
+import { Order, OrderForm } from '../types';
 import { inputProps, inputWrapperProps } from '../constants';
 import { createOrder } from '../api';
+import OrderItem from '../components/OrderItem';
+import Input from '../components/Input';
 
 export default function Order() {
   const {
@@ -12,73 +14,77 @@ export default function Order() {
     formState: { errors },
   } = useForm<OrderForm>();
 
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<Order[]>([]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      const response = await createOrder(data);
-      console.log(response);
+      const response: Order = await createOrder(data);
       setOrders((state) => {
-        console.log(state);
-        return [];
+        return [...state, response];
       });
     } catch (e) {
       console.log('create-order', e);
     }
   });
-  const inputOpt = { required: true };
 
-  useEffect(() => {
-    console.log(orders);
-  }, [orders.length]);
+  function deleteCallback(id: number) {
+    setOrders((state) => {
+      return state.filter((order) => order.Order_ID !== id);
+    });
+  }
 
   return (
-    <div className='flex justify-center'>
-      <form className='bg-gray-300 m-6 p-6 max-w-2xl' onSubmit={onSubmit}>
-        <div {...inputWrapperProps}>
-          <input
-            {...inputProps}
-            {...register('Crust', inputOpt)}
-            placeholder='Crust'
-          />
-          {errors?.Crust && <div>This field is required.</div>}
-        </div>
-        <div {...inputWrapperProps}>
-          <input
-            {...inputProps}
-            {...register('Flavor', inputOpt)}
-            placeholder='Flavor'
-          />
-          {errors?.Flavor && <div>This field is required.</div>}
-        </div>
-        <div {...inputWrapperProps}>
-          <input
-            {...inputProps}
-            {...register('Size', inputOpt)}
-            placeholder='Size'
-          />
-          {errors?.Size && <div>This field is required.</div>}
-        </div>
-        <div {...inputWrapperProps}>
-          <input
-            {...inputProps}
-            {...register('Table_No', inputOpt)}
-            placeholder='Table Number'
-          />
-          {errors?.Table_No && <div>This field is required.</div>}
-        </div>
-        <Link className='float-left py-2' to='/orders'>
+    <div className='p-6 max-w-2xl'>
+      <form className='p-6' onSubmit={onSubmit}>
+        <Input
+          {...inputProps}
+          errors={errors}
+          name='Crust'
+          register={register}
+        />
+        <Input
+          {...inputProps}
+          errors={errors}
+          name='Flavor'
+          register={register}
+        />
+        <Input
+          {...inputProps}
+          errors={errors}
+          name='Size'
+          register={register}
+        />
+        <Input
+          {...inputProps}
+          errors={errors}
+          name='Table_No'
+          placeholder='Table Number'
+          register={register}
+        />
+        <Link className='float-right py-2' to='/orders'>
           View All Orders
         </Link>
         <div {...inputWrapperProps}>
           <input
             {...inputProps}
-            className='float-right'
+            className='bg-green-700 text-white px-6 py-1 rounded'
             type='submit'
             value='Order'
           />
         </div>
       </form>
+      <h3>Recent orders:</h3>
+      <div>
+        {orders.map((order: Order) => {
+          return (
+            <OrderItem
+              key={order.Order_ID}
+              item={order}
+              deleteCallback={deleteCallback}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
